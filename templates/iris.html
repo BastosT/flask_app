@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}Données de l'Iris{% endblock %}
+
+{% block content %}
+    <h1>Données de l'Iris</h1>
+    
+    <!-- Bouton d'actualisation -->
+
+
+    <p><strong>Espèce :</strong> {{ details.species }}</p>
+    <p><strong>Longueur des sépales :</strong> {{ details.sepal_length }} cm</p>
+    <p><strong>Largeur des sépales :</strong> {{ details.sepal_width }} cm</p>
+    <p><strong>Longueur des pétales :</strong> {{ details.petal_length }} cm</p>
+    <p><strong>Largeur des pétales :</strong> {{ details.petal_width }} cm</p>
+    <img src="{{ url_for('static', filename=image_filename) }}" alt="Graphique de l'échantillon d'Iris" style="max-width: 600px;">
+    <div style="width: 100%; max-width: 600px; text-align: center; margin-bottom: 20px;">
+        <button onclick="location.reload();" class="refresh-button">Actualiser</button>
+    </div>
+
+    
+    <p class="explanation-text"> Ce graphique montre les caractéristiques de l'échantillon d'Iris, incluant la longueur et la largeur des sépales ainsi que la longueur et la largeur des pétales. Chaque barre représente une des mesures pour l'espèce d'Iris sélectionnée.</p>
+
+   
+
+    <style>
+        .refresh-button {
+            background-color: #2c3e50; /* Couleur de fond */
+            color: white; /* Couleur du texte */
+            padding: 10px 20px; /* Espacement intérieur */
+            border: none; /* Pas de bordure */
+            border-radius: 5px; /* Coins arrondis */
+            cursor: pointer; /* Curseur de main */
+            transition: background-color 0.3s, transform 0.3s; /* Effets de transition */
+        }
+
+        .refresh-button:hover {
+            background-color: #2980b9; /* Couleur au survol */
+            transform: translateY(-3px); /* Élévation au survol */
+        }
+
+        .explanation-text {
+            font-size: 16px; /* Taille de police */
+            color: #34495e; /* Couleur du texte */
+            margin: 10px 0; /* Marges verticales */
+            line-height: 1.5; /* Hauteur de ligne pour un meilleur espacement */
+            padding: 10px; /* Espacement intérieur */
+            border-left: 4px solid #2980b9; /* Bord gauche coloré */
+            background-color: #ecf0f1; /* Couleur de fond */
+            border-radius: 4px; /* Coins arrondis */
+        }
+
+    </style>
+{% endblock %}

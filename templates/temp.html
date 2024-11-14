@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+
+{% block title %}Température{% endblock %}
+
+{% block content %}
+<div id="maint" class="container mt-5">
+    <h1 class="text-center mb-4">Calculateur de Température Ressentie</h1>
+
+    <!-- Formulaire avec sliders -->
+    <form method="POST" id="formulaire" class="form-inline justify-content-center" onsubmit="handleSubmit(event)">
+        <div class="form-group mx-3">
+            <input type="range" class="custom-range" id="temperature" name="temperature" min="10" max="50" step="1" value="{{ temperature if temperature is not none else 20 }}" oninput="updateSlider(this, 'tempValue'); applyGradient(this);">
+            <label for="temperature" class="form-label d-block mt-2">Température (°C) : <span id="tempValue">{{ temperature if temperature is not none else 20 }}</span>°C</label>
+        </div>
+        <div class="form-group mx-3">
+            <input type="range" class="custom-range" id="humidite_air" name="humidite_air" min="40" max="100" step="1" value="{{ humidite_air if humidite_air is not none else 50 }}" oninput="updateSlider(this, 'humidityValue'); applyGradient(this);">
+            <label for="humidite_air" class="form-label d-block mt-2">Humidité de l'air (%) : <span id="humidityValue">{{ humidite_air if humidite_air is not none else 50 }}</span>%</label>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Calculer</button>
+    </form>
+
+    <!-- Affichage du résultat si disponible -->
+    {% if temperature_ressentie is not none %}
+    <div class="alert alert-info mt-4 text-center" style="color: black; background-color: rgb(255, {{ 255 - (temperature_ressentie * 255 / 50) | round(0) }}, 0);">
+        <h3>Résultat</h3>
+        La température ressentie est de : <strong>{{ temperature_ressentie }}°C</strong> (<strong>{{ temperature_ressentie_f|round(1) }}°F</strong>)
+    </div>
+    {% endif %}
+    
+    
+</div>
+
+<style>
+    #maint {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        margin-top: 50px;
+    }
+
+    #maint body {
+        background: linear-gradient(to right, #f8cdda, #1d2b64);
+        font-family: 'Arial', sans-serif;
+        color: #fff;
+    }
+
+    #maint h1 {
+        color: #333;
+        font-size: 2.5rem;
+    }
+
+    #maint .form-inline {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #maint .form-group {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    #maint .custom-range {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        background: linear-gradient(to right, #ff5f6d, #ffc371);
+        height: 8px;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    #maint .custom-range::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ff5f6d;
+        cursor: pointer;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+
+    #maint .form-label {
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+    #maint .btn-primary {
+        background-color: #ff5f6d;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        padding: 12px 24px;
+        border-radius: 10px;
+        transition: background-color 0.3s;
+    }
+
+    #maint .btn-primary:hover {
+        background-color: #ffc371;
+    }
+
+    #maint .alert-info {
+        background-color: #1d2b64;
+        color: #f8cdda;
+        border-color: #1d2b64;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+    }
+</style>
+
+<script>
+    function updateSlider(slider, valueId) {
+        document.getElementById(valueId).innerText = slider.value;
+    }
+
+    function applyGradient(slider) {
+        const min = parseFloat(slider.min);
+        const max = parseFloat(slider.max);
+        const value = parseFloat(slider.value);
+        const percent = (value - min) / (max - min) * 100;
+        slider.style.background = `linear-gradient(to right, #ff5f6d 0%, #ff5f6d ${percent}%, #ffc371 ${percent}%, #ffc371 100%)`;
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault(); 
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Remplace seulement la partie de la réponse qui doit être mise à jour
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const resultSection = doc.querySelector('#maint');
+            document.querySelector('#maint').innerHTML = resultSection.innerHTML;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Initial gradient application
+    document.querySelectorAll('.custom-range').forEach(slider => {
+        applyGradient(slider);
+    });
+
+function updateBackgroundColor(temperatureRessentie) {
+    const minTemp = 0; // Température minimale
+    const maxTemp = 50; // Température maximale
+    const normalizedValue = Math.min(Math.max(temperatureRessentie, minTemp), maxTemp); // Normaliser entre min et max
+    const redValue = Math.floor((normalizedValue / maxTemp) * 255); // Convertir en valeur de rouge
+
+    // Appliquer la couleur de fond
+    document.getElementById('maint').style.backgroundColor = `rgb(${redValue}, 0, 0)`; // Variation de blanc à rouge
+}
+
+// Appelez cette fonction lorsque le résultat est disponible
+
+</script>
+
+{% endblock %}

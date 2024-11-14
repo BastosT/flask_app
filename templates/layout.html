@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M & B - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #1a1c23;
+            --sidebar-hover: #2d2f35;
+            --accent-color: #6366f1;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --main-bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 80px;
+        }
+    
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--main-bg);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+    
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            transition: width 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+    
+        .logo-container {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+    
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            transition: width 0.3s ease, opacity 0.3s ease;
+        }
+    
+        .logo {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.25rem;
+            white-space: nowrap;
+            transition: opacity 0.3s;
+        }
+    
+        .sidebar.collapsed .logo-wrapper {
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+    
+        .toggle-button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: color 0.2s, transform 0.2s;
+            padding: 0;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+    
+        .sidebar.collapsed .toggle-button {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .toggle-button:hover {
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+    
+        .toggle-button svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+    
+        .sidebar.collapsed .toggle-button svg {
+            transform: rotate(180deg);
+        }
+    
+        nav {
+            padding: 1rem 0.75rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+    
+        nav::-webkit-scrollbar {
+            width: 4px;
+        }
+    
+        nav::-webkit-scrollbar-thumb {
+            background: var(--sidebar-hover);
+            border-radius: 4px;
+        }
+    
+        nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+    
+        nav a:hover {
+            color: var(--text-primary);
+            background: var(--sidebar-hover);
+        }
+    
+        nav a.active {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+    
+        .emoji {
+            font-size: 1.25rem;
+            margin-right: 1rem;
+            min-width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        .link-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+    
+        .sidebar.collapsed .link-text {
+            opacity: 0;
+            width: 0;
+        }
+    
+        #main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+            background: var(--main-bg);
+        }
+    
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+    
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+    
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 1000;
+                height: 100vh;
+            }
+    
+            #main {
+                margin-left: 0;
+                width: 100%;
+            }
+    
+            .toggle-button {
+                width: 28px;
+                height: 28px;
+            }
+    
+            .toggle-button svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    </style>
+    <script>
+        const navLinks = [
+            { href: "/", emoji: "🏠", text: "Accueil" },
+            { href: "/temp", emoji: "🌡️", text: "Température" },
+            { href: "/iris", emoji: "🌸", text: "Iris" },
+            { href: "/diabetes", emoji: "📊", text: "Diabetes" },
+            { href: "/digits", emoji: "🔢", text: "Digits" },
+            { href: "/album", emoji: "💿", text: "Album" },
+            { href: "/artiste", emoji: "🎤", text: "Artiste" },
+            { href: "/artiste_album", emoji: "🎼", text: "Artiste & Album" },
+            { href: "/actions", emoji: "📈", text: "Actions" },
+            { href: "/bitcoin", emoji: "₿", text: "Bitcoin" },
+            { href: "/ia", emoji: "🤖", text: "IA" },
+            { href: "/iaten", emoji: "🧠", text: "IA 2" },
+            { href: "/train", emoji: "🚂", text: "IA 3" }
+        ];
+
+        function generateNavLinks() {
+            const navContainer = document.querySelector('#nav-links');
+            const currentPath = window.location.pathname;
+
+            navLinks.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.href;
+                if (currentPath === link.href) {
+                    a.classList.add('active');
+                }
+                a.innerHTML = `
+                    <span class="emoji">${link.emoji}</span>
+                    <span class="link-text">${link.text}</span>
+                `;
+                navContainer.appendChild(a);
+            });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generateNavLinks();
+            
+            const toggleBtn = document.querySelector('.toggle-button');
+            toggleBtn.addEventListener('click', toggleSidebar);
+
+            // Restaurer l'état de la sidebar
+            const sidebarState = localStorage.getItem('sidebarState');
+            if (sidebarState === 'collapsed') {
+                document.querySelector('.sidebar').classList.add('collapsed');
+            }
+
+            // Active link indicator
+            const links = document.querySelectorAll('nav a');
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    links.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo-wrapper">
+                <div class="logo">Dashboard</div>
+            </div>
+            <button class="toggle-button" aria-label="Toggle Sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+        </div>
+        <nav id="nav-links"></nav>
+    </div>
+    <div id="main">
+        <div class="content-wrapper">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

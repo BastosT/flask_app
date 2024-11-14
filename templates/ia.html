@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block title %}Modèles IA{% endblock %}
+
+{% block content %}
+
+<div>
+    
+    <h1 id="title">Sélectionner un Modèle  / Classifieur RF </h1>
+
+    Vous avez pas rigolez a ma blague clash royale la team :((((
+    
+    <div id="model-selection">
+        <label for="model">Choisissez un modèle :</label>
+        <select id="model" name="model">
+            <option value="iris" {% if selected_model == 'iris' %}selected{% endif %}>Iris</option>
+            <option value="diabetes" {% if selected_model == 'diabetes' %}selected{% endif %}>Diabetes</option>
+            <option value="digit" {% if selected_model == 'digit' %}selected{% endif %}>Digit</option>
+        </select>
+    </div>
+
+    <div id="hyperparameters" style="margin-top: 20px;">
+        <h2>Hyperparamètres</h2>
+        <div class="param-group">
+            <label for="test-size" class="text-input">Taille du test (%):</label>
+            <input class="form-input" type="number" id="test-size" name="test_size" value="{{ test_size }}" min="1" max="99" step="1"> 
+        </div>
+        <div class="param-group">
+            <label for="n-estimators" class="text-input">(Random forest) N Estimators :</label>
+            <input class="form-input" type="number" id="n-estimators" name="n_estimators" value="{{ n_estimators }}" min="1"> 
+        </div>
+    </div>
+
+        <div style="margin-top: 20px;">
+            <form method="POST" action="/ia">
+                <input type="hidden" name="model" id="selected-model" value="{{ selected_model }}">
+                <input type="hidden" name="test_size" id="test-size-hidden" value="{{ test_size }}">
+                <input type="hidden" name="n_estimators" id="n-estimators-hidden" value="{{ n_estimators }}">
+                <div class="centercontainer">
+                    <button type="submit" class="btn">Exécuter le Modèle</button>
+                </div>
+            </form>
+        </div>
+
+    <div>
+
+        <p>La taille du test (%) indique la proportion des données utilisée pour évaluer la performance du modèle, tandis que N Estimators dans un modèle de forêt aléatoire spécifie le nombre d'arbres de décision qui seront créés et utilisés pour faire des prédictions, chaque arbre apportant une part à l'argument final du modèle</p>
+    </div>
+
+    <div id="loading" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: none;  z-index: 1000; background-color: rgba(0,0,0, 0.5);">
+        <div style="display: relative; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <p style="font-size: xx-large; color: white; position: fixed; top: 80%; left: 50%; transform: translate(-50%, -80%); z-index: 1000;">Les données chargent, ne bouge pas...</p>
+            <img src="https://media.tenor.com/KEzW7ALwfUAAAAAC/cat-what.gif" alt="Loading..." style="width: 700px; height: auto;" />
+        </div>
+    </div>
+
+    <h2>Résultats</h2>
+    <div id="results">
+        <h3><strong>{{ results_description }}</strong></h3>
+        <div id="results-output">
+            {% if results_data %}
+                <pre>{{ results_data }}</pre> <!-- Affichage des résultats sous forme de texte -->
+            {% else %}
+                <p>Aucun résultat disponible.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style scoped>
+
+    #title {
+        color: #2c3e50; /* Couleur du titre */
+        text-align: center;
+    }
+
+    #model-selection {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #hyperparameters {
+        text-align: center;
+    }
+
+    .param-group {
+        margin: 10px 0;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .text-input{
+        margin: 0 auto;
+        max-width: 300px;
+        width: 100%;
+        display: flex;
+        justify-content: start;
+    }
+
+    #results {
+        margin-top: 20px;
+    }
+
+    .btn {
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px 20px;
+        margin-top: 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 0 auto;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #3498db; 
+        cursor: pointer;
+        transform: translateY(-3px); 
+    }
+    .centercontainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .form-input {
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 300px; /* Limite de la largeur des champs */
+        margin: 0 auto; /* Centrer les champs d'entrée */
+    }
+
+    select {
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 300px; /* Limite de la largeur */
+        margin: 0 auto; /* Centrer le select */
+        background-color: #ffffff; /* Couleur de fond */
+        color: #34495e; /* Couleur du texte */
+        font-size: 16px; /* Taille de la police */
+        transition: border-color 0.3s;
+    }
+
+    select:focus {
+        border-color: #3498db; /* Changement de couleur de la bordure au focus */
+        outline: none; /* Supprime l'outline par défaut */
+    }
+</style>
+
+<script>
+    document.getElementById('model').addEventListener('change', function() {
+        document.getElementById('selected-model').value = this.value;
+    });
+
+    document.getElementById('test-size').addEventListener('input', function() {
+        document.getElementById('test-size-hidden').value = this.value;
+    });
+
+    document.getElementById('n-estimators').addEventListener('input', function() {
+        document.getElementById('n-estimators-hidden').value = this.value;
+    });
+
+    // Afficher le GIF de chargement lorsque le formulaire est soumis
+    document.querySelector('form').addEventListener('submit', function() {
+        document.getElementById('loading').style.display = 'block'; // Afficher le GIF
+    });
+</script>
+
+{% endblock %}

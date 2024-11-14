@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}Bitcoin{% endblock %}
+
+{% block content %}
+<h1>Bitcoin</h1>
+
+<canvas id="bitcoinChart" width="400" height="200"></canvas>
+
+<!-- Lien vers Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Préparation des données
+    const timeserie = JSON.parse('{{ timeserie|tojson | safe }}');  // Historique
+
+    // Extraire les labels et les valeurs de l'historique
+    const historicalLabels = timeserie.map(record => new Date(record.time * 1000));
+    const historicalValues = timeserie.map(record => record.value);
+
+    // Création du graphique
+    const ctx = document.getElementById('bitcoinChart').getContext('2d');
+    const bitcoinChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            // Utilisation des labels des données historiques
+            labels: historicalLabels,  // Labels uniquement de l'historique
+            datasets: [
+                {
+                    label: 'Prix du Bitcoin (Historique)',
+                    data: historicalValues,
+                    borderColor: 'rgba(75, 192, 192, 1)',  // Couleur turquoise pour l'historique
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

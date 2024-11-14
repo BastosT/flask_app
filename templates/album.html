@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Liste des Albums{% endblock %}
+
+{% block content %}
+    <style>
+        /* styles CSS pour la page des albums avec un style bento */
+
+        #title {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .album-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Grille responsive */
+            gap: 15px; /* Espacement entre les éléments */
+            padding: 0 20px; /* Marges latérales */
+        }
+
+        .album-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .album-card:hover {
+            transform: translateY(-5px); /* Élévation au survol */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .album-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            cursor: default;
+        }
+
+        .album-details {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+
+    <h1 id="title">Liste des Albums</h1>
+    Les albums sont ici HIHI HAHAH   (clash royale le meme)
+    <div class="album-container">
+        {% for album in albums %}
+            <div class="album-card">
+                <span class="album-name">{{ album.Title }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

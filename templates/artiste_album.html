@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}Données de l'Iris{% endblock %}
+
+{% block content %}
+<style>
+    /* styles CSS intégrés pour la page des artistes */
+
+
+
+    #title {
+        color: #333;
+        text-align: center;
+    }
+
+    ul {
+        list-style-type: none; /* Supprime les puces */
+        padding: 0;
+    }
+
+    li {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 10px 0;
+        transition: background 0.3s;
+    }
+
+    .li:hover {
+        background: #e2e2e2; /* Changement de couleur au survol */
+    }
+
+    .artist-name {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .album-details {
+        font-size: 14px;
+        color: #666;
+    }
+</style>
+    <h1 id="title">Artistes et Albums</h1>
+    <ul>
+        {% for artist in artists %}
+        <li class="li">
+            <span class="artist-name">{{ artist.Name }} ({{ artist.Albums | length }} album{{ 's' if artist.Albums | length > 1 else '' }})</span>
+            <ul class="album-list">
+            {% if artist.Albums %}
+                {% for album in artist.Albums %}
+                    <li>{{ album }}</li> 
+                {% endfor %}
+            {% else %}
+                <li>Aucun album disponible</li>
+            {% endif %}
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+
+    {% endblock %}

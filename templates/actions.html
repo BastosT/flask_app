@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block title %}Actions{% endblock %}
+
+{% block content %}
+
+<div>
+    <h1 id="title">Liste des actions</h1>
+    <ul id="list-btn">
+        <a class="btn" href="/question?keyword=liste_artiste">Liste des artistes</a>
+        <a class="btn" href="/question?keyword=nb_album_artiste">Nombre d'albums par artiste</a>
+        <a class="btn" href="/question?keyword=artistes_populaires">Artistes populaires</a>
+        <a class="btn" href="/question?keyword=clients_depensiers">Clients les plus dépensiers</a>
+        <a class="btn" href="/question?keyword=genres_pistes">Genres et Nombres de pistes</a>
+    </ul>
+
+    <h2>Réponse</h2>
+    <div> 
+        <h3><strong>{{ description }}</strong></h3>
+        {% if response_data %}
+            <ul>
+                {% if keyword == 'liste_artiste' %}
+                    {% for artist in response_data %}
+                        <li>{{ artist.Name }}</li>
+                    {% endfor %}
+                {% elif keyword == 'nb_album_artiste' %}
+                    {% for item in response_data %}
+                        {% for artist, album_count in item.items() %}
+                            <li>{{ artist }}: {{ album_count }} album{% if album_count > 1 %}s{% endif %}</li>
+                        {% endfor %}
+                    {% endfor %}
+                {% elif keyword == 'artistes_populaires' %}
+                    <div style="display: flex; justify-content: center;">
+                        {% for artist in response_data[:1] %}
+                            <div style="font-size: 24px; margin: 15px; text-align: center;">
+                                <div style=" font-weight: bold;">#{{ loop.index }}</div>
+                                <div>{{ artist.Name }}</div>
+                                <div>{{ artist.NumSales }} vente{% if artist.NumSales > 1 %}s{% endif %}</div>
+                            </div>
+                        {% endfor %}   
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                        {% for artist in response_data[1:2] %}
+                            <div style="font-size: 18px; margin: 15px 35px; text-align: center;">
+                                <div style=" font-weight: bold;">#{{ loop.index+1 }}</div>
+                                <div>{{ artist.Name }}</div>
+                                <div>{{ artist.NumSales }} vente{% if artist.NumSales > 1 %}s{% endif %}</div>
+                            </div>
+                        {% endfor %}   
+                        {% for artist in response_data[2:3] %}
+                            <div style="font-size: 17px; margin: 15px 35px; text-align: center;">
+                                <div style=" font-weight: bold;">#{{ loop.index+2 }}</div>
+                                <div>{{ artist.Name }}</div>
+                                <div>{{ artist.NumSales }} vente{% if artist.NumSales > 1 %}s{% endif %}</div>
+                            </div>
+                        {% endfor %}   
+                    </div>
+                    <ul>
+                        {% for artist in response_data[3:] %}
+                            <li>#{{ loop.index + 3 }} {{ artist.Name }}: {{ artist.NumSales }} vente{% if artist.NumSales > 1 %}s{% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                {% elif keyword == 'clients_depensiers' %}
+
+                    <div style="display: flex; justify-content: center;">
+                        {% for client in response_data[:1] %}
+                            <div style="font-size: 24px; margin: 15px; text-align: center;">
+                                <div style=" font-weight: bold;">#{{ loop.index }}</div>
+                                <div>{{ client.CustomerName }}</div>
+                                <div>{{ client.TotalSpent }} $</div>
+                            </div>
+                        {% endfor %}   
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                        {% for client in response_data[1:2] %}
+                            <div style="font-size: 18px; margin: 15px 35px; text-align: center;">
+                                <div style=" font-weight: bold;">#{{ loop.index+1 }}</div>
+                                <div>{{ client.CustomerName }}</div>
+                                <div>{{ client.TotalSpent }} $</div>
+                            </div>
+                        {% endfor %}   
+                        {% for client in response_data[2:3] %}
+                            <div style="font-size: 17px; margin: 15px 35px; text-align: center;">
+                                <div style=" font-weight: bold;">#{{ loop.index+2 }}</div>
+                                <div>{{ client.CustomerName }}</div>
+                                <div>{{ client.TotalSpent }} $</div>
+                            </div>
+                        {% endfor %}   
+                    </div>
+                    <ul>
+                        {% for client in response_data[3:] %}
+                            <li>#{{ loop.index + 3 }} {{ client.CustomerName }}: {{ client.TotalSpent }} $</li>
+                        {% endfor %}
+                    </ul>
+                    {% elif keyword == 'genres_pistes' %}
+                    <h3>Genres et Nombre de Pistes</h3>
+                    <ul>
+                        {% for genre in response_data %}
+                            <li>{{ genre.GenreName }}: {{ genre.TrackCount }} piste{% if genre.TrackCount > 1 %}s{% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <canvas id="genresChart"></canvas>
+                    <script>
+                        const ctx = document.getElementById('genresChart').getContext('2d');
+                        const genres = {{ response_data | tojson }};
+                        const labels = genres.map(g => g.GenreName);
+                        const data = genres.map(g => g.TrackCount);
+                
+                        const genresChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Nombre de pistes par genre',
+                                    data: data,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                
+                {% else %}
+                    <li>Données non disponibles pour ce keyword.</li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+    
+</div>
+
+<style scoped>
+    #title {
+        color: #2c3e50; /* Couleur du titre */
+        text-align: center;
+    }
+
+    #list-btn {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        justify-content: center; /* Centre les éléments */
+    }
+
+    .btn {
+        list-style: none;
+        background-color: #2c3e50; /* Couleur de fond des éléments */
+        color: white;
+        padding: 1rem 1.5rem; /* Amélioration du padding */
+        margin: 0.5rem;
+        border-radius: 8px; /* Bords arrondis */
+        transition: background-color 0.3s, transform 0.3s; /* Transition douce */
+        flex: 0 1 150px; /* Flexibilité des éléments, largeur fixe */
+        max-width: 200px; /* Largeur maximale */
+        text-align: center; /* Centrer le texte */
+        text-decoration: none;
+    }
+
+    .btn:hover {
+        background-color: #3498db; /* Couleur de fond au survol */
+        cursor: pointer;
+        transform: translateY(-3px); /* Légère élévation au survol */
+    }
+</style>
+
+{% endblock %}

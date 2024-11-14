@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}Diabète Data{% endblock %}
+
+{% block content %}
+    <h1>Données du diabète</h1>
+    <p><strong>Âge:</strong> {{ details.age }}</p>
+    <p><strong>Sexe:</strong> {{ details.sex }}</p>
+    <p><strong>Indice de Masse Corporelle (IMC):</strong> {{ details.bmi }}</p>
+    <p><strong>Pression Artérielle:</strong> {{ details.bp }}</p>
+    <p><strong>S1:</strong> {{ details.s1 }}</p>
+    <p><strong>S2:</strong> {{ details.s2 }}</p>
+    <p><strong>S3:</strong> {{ details.s3 }}</p>
+    <p><strong>S4:</strong> {{ details.s4 }}</p>
+    <p><strong>S5:</strong> {{ details.s5 }}</p>
+    <p><strong>S6:</strong> {{ details.s6 }}</p>
+    <p><strong>Valeur cible:</strong> {{ details.target }}</p>
+{% endblock %}
