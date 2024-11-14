@@ -58,8 +58,11 @@ L'application permet d'entraîner des modèles sur les datasets disponibles et d
     Chargement des Données : Les datasets peuvent être chargés dynamiquement pour entraîner différents modèles.
     Entraînement des Modèles : Les modèles sont entraînés sur les datasets pour obtenir des prédictions et évaluer la performance.
     Évaluation des Modèles : Les performances des modèles sont évaluées à l'aide de métriques comme l'accuracy, le recall, et le F1-score.
-``` git clone https://github.com/BastosT/flask_app.git
-cd flask_app
- ```
+
+
+Utilisation
+
+    L'application permet d'entraîner des modèles sur différents datasets disponibles via une interface utilisateur.
+    Les résultats des modèles, y compris les visualisations et les prédictions, sont affichés directement sur l'interface.
 
     
